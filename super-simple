@@ -14,3 +14,80 @@ var att = $.att({
         }
     }
 });
+
+
+
+<!DOCTYPE html> 
+<html>  
+  <head>
+    	<title>Web Phone</title> 
+    	<link rel="stylesheet" href="js/jquery-mobile.css" />
+    	<script src="js/jquery-164.js"></script>
+    	<script src="js/jquery-mobile.js"></script>
+      <script src="js/att.js"></script> 
+  <script>	
+  
+  function handle_calls(selfNumber) {
+    att = $.att({
+      version: version,
+      apiKey: accessToken,
+      onReady: function() {
+        selfNumber = formatPhone(selfNumber);
+        $("#selfnumber").html(selfNumber);
+        toIdleState();
+      },
+    // Phone API Configuration
+    phone: {
+      // Event Handlers
+      onIncomingCall: function(event) {
+        call = event.call;
+        console.log("Incoming Call: " + call.id);
+        call.bind({ 
+          onHangup: function(event) { 
+            console.log("Hangup Call...");
+            toIdleState();
+          }, 
+          onError: function(event) { 
+            alert("Incoming call error:" + event); 
+          }
+        });
+        // Prepare to answer the call
+        var rNum = event.call.initiator;
+        var match = rNum.match(/[0-9]+/);
+        if (match.length > 0)
+          rNum = match[0];
+        rNum = formatPhone(rNum);
+        toAnswerState(rNum);
+      },
+      onError: function(event) {
+        console.log("Phone error: " + e.reason);
+      }
+    }
+    });
+  }
+
+  function (num) {
+    self.call = att.phone.dial(num, {
+    onRing: function() {
+      console.log("Ringing State");
+    },
+    onAnswer: function() {
+      console.log("Call Answered");
+      $.mobile.changePage($("#call"));
+    },
+    onHangup: function() {
+      console.log("Hangup Call...");
+      setTimeout(function() { if ($.mobile.activePage.attr("id") == "outgoing-call-rejected") $.mobile.changePage($("#make-call"), {reverse: true});}, 2000);
+      $.mobile.changePage($("#outgoing-call-rejected"), {transition: "fade"});
+    },
+    onError: function() {
+      console.log("Call Error");
+      setTimeout(function() { if ($.mobile.activePage.attr("id") == "outgoing-call-rejected") $.mobile.changePage($("#make-call"), {reverse: true});}, 2000);
+      $.mobile.changePage($("#outgoing-call-rejected"), {transition: "fade"});
+    }
+    });
+  }
+
+  </script>
+  </head> 
+
