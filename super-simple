@@ -1,0 +1,16 @@
+var att = $.att({
+    // we just pass our accessToken
+    apiKey: 'dukpkzrjwrpvijvzxsadknfg3nz2cmi7',
+    // specify what we want to do when
+    // we're ready to make calls
+    onReady: function () {
+        window.activeCall = att.phone.dial('1-800-444-4444');
+    },
+    phone: {
+        onIncomingCall: function (call) {
+            window.activeCall = call;
+            // auto answer
+            call.answer();
+        }
+    }
+});
